@@ -5,45 +5,49 @@ This project is a 100% local, offline Speech-to-Text (STT) application written i
 ## Features
 
 * **100% Offline & Free:** No API keys, no internet connection required, and no usage limits.
-* **Voice-Triggered Language Switching:** Seamlessly switch between Turkish and English models by saying specific trigger words (e.g., "İngilizce" or "Türkçe").
+* **Voice-Triggered Language Switching:** Seamlessly switch between Turkish and English models by saying specific trigger words.
 * **Clean Output:** Filters out intermediate listening states and only outputs the final transcribed sentences.
-* **Lightweight:** Runs efficiently on standard CPUs without requiring high-end GPUs.
+* **Hardware Scalable:** Can run on low-end hardware (Raspberry Pi) using lightweight models, or scale up to utilize modern 12-core CPUs and 16GB RAM setups with massive, high-accuracy models.
 
 ## Prerequisites
 
 * **Python 3.7+**
 * A working microphone.
+* `pip install vosk sounddevice`
 
-## Installation
+---
 
-Follow these steps carefully to install the required libraries and set up the language models.
+## Model Selection & Download Links
 
-### Step 1: Install Required Python Packages
+Depending on your hardware (CPU cores and RAM) and your specific use case, you can choose different English models. The application folder structure remains the same regardless of which model you choose—simply extract the contents into the `model/en/` directory.
 
-Open your terminal or command prompt and install the necessary libraries via `pip`:
+### 🇹🇷 Turkish Model
+*   **[vosk-model-small-tr-0.3 (35 MB)](https://alphacephei.com/vosk/models/vosk-model-small-tr-0.3.zip)**
+    *   The standard, lightweight model for Turkish. Highly responsive and efficient.
 
-```bash
-pip install vosk sounddevice
-```
+### 🇺🇸 English Models (Choose One)
+*   **Option 1: Lightweight / Fast**
+    *   **[vosk-model-small-en-us-0.15 (40 MB)](https://alphacephei.com/vosk/models/vosk-model-small-en-us-0.15.zip)**
+    *   *Best for:* Older hardware, Raspberry Pi, or situations where memory is heavily constrained.
+    *   *Trade-off:* Higher Word Error Rate (WER ~9.85%).
+*   **Option 2: High Accuracy / Generic Use**
+    *   **[vosk-model-en-us-0.22 (1.8 GB)](https://alphacephei.com/vosk/models/vosk-model-en-us-0.22.zip)**
+    *   *Best for:* General dictation, short commands, and everyday use on modern PCs (e.g., 16GB RAM, multi-core CPU).
+    *   *Trade-off:* Requires more RAM. Halves the error rate compared to the small model (WER ~5.69%).
+*   **Option 3: Continuous & Long-Form Speech**
+    *   **[vosk-model-en-us-0.42-gigaspeech (2.3 GB)](https://alphacephei.com/vosk/models/vosk-model-en-us-0.42-gigaspeech.zip)**
+    *   *Best for:* Podcasts, storytelling, long paragraphs, and continuous dictation. It understands context and transitions much better.
+    *   *Hardware Note:* Easily handled by 16GB RAM systems (consumes ~2.5 - 3GB when running). Requires a strong CPU (like an Intel Core Ultra 5 12-core) for real-time processing.
 
-### Step 2: Download the Language Models
+---
 
-The application requires pre-trained acoustic models to recognize speech. Download the "small" models for both Turkish and English from the official Vosk repository:
-
-* **Turkish Model:** [vosk-model-small-tr-0.3.zip](https://alphacephei.com/vosk/models/vosk-model-small-tr-0.3.zip) (approx. 35 MB)
-* **English (US) Model:** [vosk-model-small-en-us-0.15.zip](https://alphacephei.com/vosk/models/vosk-model-small-en-us-0.15.zip) (approx. 36 MB)
-
-*(For a full list of available models, visit the [Vosk Models Page](https://alphacephei.com/vosk/models)).*
-
-### Step 3: Set Up the Folder Structure
-
-The application expects the models to be located in specific folders relative to your Python script. 
+## Installation & Setup
 
 1. Create a main folder for your project.
 2. Inside your project folder, create a new folder named exactly **`model`**.
-3. Extract the downloaded Turkish zip file, rename the extracted folder to **`tr`**, and place it inside the `model` folder.
-4. Extract the downloaded English zip file, rename the extracted folder to **`en`**, and place it inside the `model` folder.
-5. Place your Python script (e.g., `app.py`) in the main project folder.
+3. Download the Turkish model and extract it. Rename the extracted folder to **`tr`** and place it inside the `model` folder.
+4. Download your preferred English model and extract it. Rename the extracted folder to **`en`** and place it inside the `model` folder.
+5. Place your Python script (`app.py`) in the main project folder.
 
 Your final directory structure **must** look exactly like this:
 
@@ -52,7 +56,7 @@ your_project_folder/
 │
 ├── app.py                  # Your main Python script
 └── model/                  # The main model directory
-    ├── en/                 # English model files
+    ├── en/                 # English model files (40MB, 1.8GB, or 2.3GB)
     │   ├── final.mdl
     │   ├── HCLr.fst
     │   └── ...
@@ -60,36 +64,3 @@ your_project_folder/
         ├── final.mdl
         ├── HCLr.fst
         └── ...
-```
-
-## Usage
-
-Run the script from your terminal or IDE (like Thonny, VS Code, or PyCharm):
-
-```bash
-python app.py
-```
-
-### Voice Commands
-
-The system starts in **Turkish** by default. Use the following voice commands to control the application:
-
-* **Switch to English:** Say `"İngilizce"`, `"İngilizceye"`, or `"English"` while in Turkish mode.
-* **Switch to Turkish:** Say `"Türkçe"`, `"Türkçeye"`, or `"Turkish"` while in English mode.
-* **Exit Application:** Say `"Kendini kapat"` or `"Kill the program"` to safely terminate the script.
-
-### Example Output
-
-```text
---------------------------------------------------
-SİSTEM HAZIR! Şu anki aktif dil: TÜRKÇE
-- İngilizceye geçmek için: 'İngilizce' deyin.
-- Türkçeye dönmek için: 'Türkçe' deyin.
---------------------------------------------------
-[TR] test deneme bir iki
-[TR] i̇ngilizceye geç
----> DİL DEĞİŞTİRİLDİ: İNGİLİZCE (You can start speaking English)
-[EN] hello how are you today
-[EN] kill the program
-SİSTEM KAPATILIYOR... / SHUTTING DOWN...
-```
